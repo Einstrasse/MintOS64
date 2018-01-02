@@ -5,3 +5,4 @@ BootLoader.bin: BootLoader.asm
 	
 clean:
 	rm -f BootLoader.bin
+	
