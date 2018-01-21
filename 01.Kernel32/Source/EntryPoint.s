@@ -22,7 +22,7 @@ START:
 	mov cr0, eax
 
 	; CS Segment selector : EIP (??)
-	jmp dword 0x08: ( PROTECTEDMODE - $$ + 0x10000 )
+	jmp dword 0x08: 0x10200
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ; Enter to protected mode
