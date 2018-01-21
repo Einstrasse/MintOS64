@@ -21,8 +21,11 @@ START:
 	mov eax, 0x4000003B
 	mov cr0, eax
 
-	; CS Segment selector : EIP (??)
-	jmp dword 0x08: 0x10200
+	; CS Segment selector : 0x00
+	; 보호모드에서 세그먼트 디스크립터를 GDTR에서 오프셋 0x08에 있는놈을 가르키게 하기 위해서 dword 0x08: 가 들어감
+	; 리얼모드에서 코드 세그먼트 레지스터에 0x1000이 들어있었으므로 Base address가 0x10000이었다. 따라서 이 값을 더해줘야
+	; 리얼모드->보호모드 로 변경되더라도 같은 주소를 가르키게 된다.
+	jmp dword 0x08: (PROTECTEDMODE - $$ + 0x10000)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ; Enter to protected mode
@@ -46,7 +49,7 @@ PROTECTEDMODE:
 	call PRINTMESSAGE
 	add esp, 12
 
-	jmp $ ; inf loop
+	jmp dword 0x08: 0x10200 ; Jump to C kernel
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ; function code area
