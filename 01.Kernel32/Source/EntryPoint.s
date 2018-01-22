@@ -12,7 +12,26 @@ START:
 	mov ds, ax ; DS segment register set to 0x1000
 	mov es, ax ; ES segment register set to 0x1000
 
-	cli ; Inactivate interrupt
+;;;;;;;;;;;;;;;;;;;;;;;;
+; A20 게이트 활성화
+;;;;;;;;;;;;;;;;;;;;;;;;
+; BIOS 서비스를 통한 활성화
+mov ax, 0x2401
+int 0x15
+
+jc .A20GATEERROR
+jmp .A20GATESUCCESS
+
+.A20GATEERROR:
+	;에러 발생 시, 시스템 컨트롤 포트를 통한 전환 시도
+	in al, 0x92
+	or al, 0x02
+	and al, 0xFE
+	out 0x92, al
+
+.A20GATESUCCESS:
+
+	cli ; Inactivate interrupt to avoid side effect
 	lgdt [ GDTR ] ; GDT table load
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
