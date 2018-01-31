@@ -1,4 +1,5 @@
 #include "Types.h"
+#include "Page.h"
 
 void kPrintString( int iX, int iY, const char* pcString );
 BOOL kInitializeKernel64Area(void);
@@ -26,6 +27,11 @@ void Main(void) {
 	} else {
 		kPrintString(45, 5, "Pass");
 	}
+
+	// IA-32e 모드의 커널을 위한 페이지 테이블 생성
+	kPrintString(0, 6, "Page Tables Initialize......................[    ]");
+	kInitializePageTables();
+	kPrintString( 45, 6, "Pass" );
 
 
 

@@ -1,5 +1,5 @@
 #################################################################
-# ºôµå È¯°æ ¹× ±ÔÄ¢ ¼³Á¤
+# ë¹Œë“œ í™˜ê²½ ë° ê·œì¹™ ì„¤ì •
 #################################################################
 NASM32=nasm
 GCC32=x86_64-pc-linux-gcc.exe -c -m32 -ffreestanding
@@ -10,7 +10,7 @@ OBJECTDIRECTORY = Temp
 SOURCEDIRECTORY = Source
 
 #################################################################
-# ºôµå Ç×¸ñ ¹× ºôµå ¹æ¹ý ¼³Á¤
+# ë¹Œë“œ í•­ëª© ë° ë¹Œë“œ ë°©ë²• ì„¤ì •
 #################################################################
 
 
@@ -42,20 +42,20 @@ clean:
 	rm -f $(OBJECTDIRECTORY)/*.*
 	
 #################################################################
-# Make¿¡ ÀÇÇØ ´Ù½Ã È£ÃâµÇ´Â ºÎºÐ, Temp µð·ºÅÍ¸®¸¦ ±âÁØÀ¸·Î ÀÛ¼ºµÊ
+# Makeì— ì˜í•´ ë‹¤ì‹œ í˜¸ì¶œë˜ëŠ” ë¶€ë¶„, Temp ë””ë ‰í„°ë¦¬ë¥¼ ê¸°ì¤€ìœ¼ë¡œ ìž‘ì„±ë¨
 #################################################################
 
 CENTRYPOINTOBJECTFILE = Main.o
 CSOURCEFILES = $(wildcard ../$(SOURCEDIRECTORY)/*.c)
 ASSEMBLYSOURCEFILES = $(wildcard ../$(SOURCEDIRECTORY)/*.asm)
-COJBECTFILES = $(subst Main.o, , $(notdir $(patsubst %.c,%.o,$(SOURCEFILES))))
+COJBECTFILES = $(subst Main.o, , $(notdir $(patsubst %.c,%.o,$(CSOURCEFILES))))
 ASSEMBLYOBJECTFILES = $(notdir $(patsubst %.asm,%.o,$(ASSEMBLYSOURCEFILES)))
 
-# .c ÆÄÀÏÀ» .o ÆÄÀÏ·Î ¹Ù²Ù´Â ±ÔÄ¢ Á¤ÀÇ
+# .c íŒŒì¼ì„ .o íŒŒì¼ë¡œ ë°”ê¾¸ëŠ” ê·œì¹™ ì •ì˜
 %.o: ../$(SOURCEDIRECTORY)/%.c
 	$(GCC32) -c $<
 	
-# .asm ÆÄÀÏÀ» .o ÆÄÀÏ·Î ¹Ù²Ù´Â ±ÔÄ¢ Á¤ÀÇ
+# .asm íŒŒì¼ì„ .o íŒŒì¼ë¡œ ë°”ê¾¸ëŠ” ê·œì¹™ ì •ì˜
 %.o: ../$(SOURCEDIRECTORY)/%.asm
 	$(NASM32) -f elf32 -o $@ $<
 	
