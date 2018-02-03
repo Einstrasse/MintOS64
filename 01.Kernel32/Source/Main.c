@@ -5,14 +5,16 @@
 void kPrintString( int iX, int iY, const char* pcString );
 BOOL kInitializeKernel64Area(void);
 BOOL kIsMemoryEnough(void);
-// Main ÇÔ¼ö
+void kCopyKernel64ImageTo2Mbyte(void);
+
+// Main í•¨ìˆ˜
 void Main(void) {
 	DWORD dwEAX, dwEBX, dwECX, dwEDX;
 	char vcVendorString[13] = { 0, };
 
-	kPrintString( 0, 3, "C Language Kernel Started...................[Pass]" );
+	kPrintString(0, 3, "Protected Mode C Language Kernel Start......[Pass]" );
 
-	//ÃÖ¼Ò ¸Ş¸ğ¸® Å©±âÀÎ 64MB¸¦ ³Ñ´ÂÁö °Ë»ç
+	//ìµœì†Œ ë©”ëª¨ë¦¬ í¬ê¸°ì¸ 64MBë¥¼ ë„˜ëŠ”ì§€ ê²€ì‚¬
 	kPrintString(0, 4, "Minimum Memory Size Check...................[    ]");
 	if ( kIsMemoryEnough() == FALSE ) {
 		kPrintString(45, 4, "Fail");
@@ -22,7 +24,7 @@ void Main(void) {
 		kPrintString(45, 4, "Pass");
 	}
 
-	// IA-32e ¸ğµåÀÇ Ä¿³Î ¿µ¿ªÀ» ÃÊ±âÈ­
+	// IA-32e ëª¨ë“œì˜ ì»¤ë„ ì˜ì—­ì„ ì´ˆê¸°í™”
 	kPrintString(0, 5, "IA-32e Kernel Area Initialization...........[    ]");
 	if (kInitializeKernel64Area() == FALSE) {
 		kPrintString(45, 5, "Fail");
@@ -32,12 +34,12 @@ void Main(void) {
 		kPrintString(45, 5, "Pass");
 	}
 
-	// IA-32e ¸ğµåÀÇ Ä¿³ÎÀ» À§ÇÑ ÆäÀÌÁö Å×ÀÌºí »ı¼º
+	// IA-32e ëª¨ë“œì˜ ì»¤ë„ì„ ìœ„í•œ í˜ì´ì§€ í…Œì´ë¸” ìƒì„±
 	kPrintString(0, 6, "Page Tables Initialize......................[    ]");
 	kInitializePageTables();
 	kPrintString( 45, 6, "Pass" );
 
-	// ÇÁ·Î¼¼¼­ º¥´õ Á¤º¸ ÀĞ±â
+	// í”„ë¡œì„¸ì„œ ë²¤ë” ì •ë³´ ì½ê¸°
 	kReadCPUID( 0x00, &dwEAX, &dwEBX, &dwECX, &dwEDX );
 	*(DWORD*) vcVendorString = dwEBX;
 	*( (DWORD*) vcVendorString + 1 ) = dwEDX;
@@ -45,7 +47,7 @@ void Main(void) {
 	kPrintString(0, 7, "Processor Vendor String.....................[            ]");
 	kPrintString(45, 7, vcVendorString);
 
-	//64ºñÆ® Áö¿ø À¯¹« È®ÀÎ
+	//64ë¹„íŠ¸ ì§€ì› ìœ ë¬´ í™•ì¸
 	kReadCPUID(0x80000001, &dwEAX, &dwEBX, &dwECX, &dwEDX);
 	kPrintString(0, 8, "64bit Mode Support Check....................[    ]");
 	if ( dwEDX & (1 << 29 )) {
@@ -56,16 +58,20 @@ void Main(void) {
 		while( TRUE );
 	}
 
-	//IA-32e ¸ğµå·Î ÀüÈ¯
-	kPrintString(0, 9, "Switch To IA-32e Mode");
-	// kSwitchAndExecute64bitKernel();
+	//IA-32e ëª¨ë“œ ì»¤ë„ì„ 0x200000(2MByte) ì–´ë“œë ˆìŠ¤ë¡œ ì´ë™
+	kPrintString(0, 9, "Copy IA-32e Kernel to 2M Address............[    ]");
+	kCopyKernel64ImageTo2Mbyte();
+	kPrintString(45, 9, "Pass");
+	//IA-32e ëª¨ë“œë¡œ ì „í™˜
+	kPrintString(0, 10, "Switch To IA-32e Mode");
+	kSwitchAndExecute64bitKernel();
 
 
 	while ( TRUE ) ;
 
 }
 
-//¹®ÀÚ¿­ Ãâ·Â ÇÔ¼ö
+//ë¬¸ìì—´ ì¶œë ¥ í•¨ìˆ˜
 void kPrintString( int iX, int iY, const char* pcString ) {
 	CHARACTER* pstScreen = ( CHARACTER* ) 0xB8000;
 	int i;
@@ -75,7 +81,7 @@ void kPrintString( int iX, int iY, const char* pcString ) {
 		pstScreen[i].bCharactor = pcString[i];
 	}
 }
-//IA-32e ¸ğµå¿ë Ä¿³Î ¿µ¿ªÀ» 0À¸·Î ÃÊ±âÈ­. ¼º°ø½Ã True, ½ÇÆĞ½Ã False ¹İÈ¯
+//IA-32e ëª¨ë“œìš© ì»¤ë„ ì˜ì—­ì„ 0ìœ¼ë¡œ ì´ˆê¸°í™”. ì„±ê³µì‹œ True, ì‹¤íŒ¨ì‹œ False ë°˜í™˜
 BOOL kInitializeKernel64Area(void) {
 	DWORD* pdwCurrentAddress;
 	pdwCurrentAddress = (DWORD*) 0x100000;
@@ -93,7 +99,7 @@ BOOL kInitializeKernel64Area(void) {
 BOOL kIsMemoryEnough(void) {
 	DWORD* pdwCurrentAddress;
 
-	pdwCurrentAddress = (DWORD*) 0x100000; // 1MBºÎÅÍ °Ë»ç ½ÃÀÛ
+	pdwCurrentAddress = (DWORD*) 0x100000; // 1MBë¶€í„° ê²€ì‚¬ ì‹œì‘
 
 	while ( (DWORD)pdwCurrentAddress < 0x4000000 ) {
 		*pdwCurrentAddress = 0x12345678;
@@ -103,4 +109,21 @@ BOOL kIsMemoryEnough(void) {
 		pdwCurrentAddress += ( 0x100000 / sizeof(DWORD) );
 	}
 	return TRUE;
+}
+
+void kCopyKernel64ImageTo2Mbyte(void) {
+	WORD wKernel32SectorCount, wTotalKernelSectorCount, wKernel64SectorCount;
+	DWORD* pdwSourceAddress, *pdwDestinationAddress;
+	int i;
+	wTotalKernelSectorCount = *( (WORD*) 0x7C05 );
+	wKernel32SectorCount = *( (WORD*) 0x7C07 );
+	wKernel64SectorCount = wTotalKernelSectorCount - wKernel32SectorCount;
+	pdwSourceAddress = (DWORD*)(0x10000 + wKernel32SectorCount * 512);
+	pdwDestinationAddress = (DWORD*) 0x200000;
+
+	for (i=0; i < 512 * wKernel64SectorCount / sizeof(DWORD); i++) {
+		*pdwDestinationAddress = *pdwSourceAddress;
+		pdwDestinationAddress++;
+		pdwSourceAddress++;
+	}
 }

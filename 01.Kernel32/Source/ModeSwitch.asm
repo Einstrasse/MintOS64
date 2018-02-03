@@ -6,12 +6,12 @@
 ;
 
  [BITS 32]
- ; C¾ð¾î¿¡¼­ È£ÃâÇÒ ¼ö ÀÖµµ·Ï ÀÌ¸§À» ³ëÃâÇÔ(Export)
+ ; Cì–¸ì–´ì—ì„œ í˜¸ì¶œí•  ìˆ˜ ìžˆë„ë¡ ì´ë¦„ì„ ë…¸ì¶œí•¨(Export)
  global kReadCPUID, kSwitchAndExecute64bitKernel
 
  SECTION .text
 
- ; CPUID¸¦ ¹ÝÈ¯ÇÏ´Â ÇÔ¼ö
+ ; CPUIDë¥¼ ë°˜í™˜í•˜ëŠ” í•¨ìˆ˜
  ; Param: DWORD dwEAX, DWORD* pdwEAX, *pdwEBX, *pdwECX, *pdwEDX
  kReadCPUID:
  	push ebp
@@ -28,15 +28,15 @@
  	;; ebp+12 -> 2nd param..
 
  	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- 	; EAX ·¹Áö½ºÅÍ °ªÀ¸·Î CPUID ¸í·É¾î ½ÇÇà
+ 	; EAX ë ˆì§€ìŠ¤í„° ê°’ìœ¼ë¡œ CPUID ëª…ë ¹ì–´ ì‹¤í–‰
  	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
  	mov eax, dword [ ebp + 8 ]
  	cpuid
 
  	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- 	; ¹ÝÈ¯°ªÀ» ÆÄ¶ó¸ÞÅÍ¿¡ ÀúÀå
+ 	; ë°˜í™˜ê°’ì„ íŒŒë¼ë©”í„°ì— ì €ìž¥
  	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- 	mov esi, dword [ ebp + 12 ] ; 1,2,3,4 ÆÄ¶ó¸ÞÅÍ°¡ Æ÷ÀÎÅÍÀÌ¹Ç·Î °£Á¢ÂüÁ¶ÇÏ±â À§ÇØ esi¸¦ »ç¿ëÇÔ
+ 	mov esi, dword [ ebp + 12 ] ; 1,2,3,4 íŒŒë¼ë©”í„°ê°€ í¬ì¸í„°ì´ë¯€ë¡œ ê°„ì ‘ì°¸ì¡°í•˜ê¸° ìœ„í•´ esië¥¼ ì‚¬ìš©í•¨
  	mov dword [ esi ], eax
 
  	mov esi, dword [ ebp + 16 ]
@@ -56,24 +56,24 @@
  	pop ebp
  	ret
 
- ; IA-32e ¸ðµå·Î ÀüÈ¯ÇÏ°í 64ºñÆ® Ä¿³ÎÀ» ¼öÇàÇÏ´Â ÇÔ¼ö
+ ; IA-32e ëª¨ë“œë¡œ ì „í™˜í•˜ê³  64ë¹„íŠ¸ ì»¤ë„ì„ ìˆ˜í–‰í•˜ëŠ” í•¨ìˆ˜
  ; PARAM: (void)
  kSwitchAndExecute64bitKernel:
  	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- 	; CR4 ÄÁÆ®·Ñ ·¹Áö½ºÅÍÀÇ PAE(Physical Address Extension) ºñÆ®¸¦ 1·Î ¼³Á¤
+ 	; CR4 ì»¨íŠ¸ë¡¤ ë ˆì§€ìŠ¤í„°ì˜ PAE(Physical Address Extension) ë¹„íŠ¸ë¥¼ 1ë¡œ ì„¤ì •
  	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
  	mov eax, cr4
  	or eax, 0x20
  	mov cr4, eax
 
  	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- 	; CR3 ÄÁÆ®·Ñ ·¹Áö½ºÅÍ¿¡ PML4 Å×ÀÌºíÀÇ ¾îµå·¹½º¿Í Ä³½Ã È°¼ºÈ­
+ 	; CR3 ì»¨íŠ¸ë¡¤ ë ˆì§€ìŠ¤í„°ì— PML4 í…Œì´ë¸”ì˜ ì–´ë“œë ˆìŠ¤ì™€ ìºì‹œ í™œì„±í™”
  	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- 	mov eax, 0x10000
+ 	mov eax, 0x100000
  	mov cr3, eax
 
  	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- 	; IA32_EFER.LME¸¦ 1·Î ¼³Á¤ÇÏ¿© IA-32e ¸ðµå¸¦ È°¼ºÈ­
+ 	; IA32_EFER.LMEë¥¼ 1ë¡œ ì„¤ì •í•˜ì—¬ IA-32e ëª¨ë“œë¥¼ í™œì„±í™”
  	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
  	mov ecx, 0xC0000080
  	rdmsr
@@ -83,13 +83,13 @@
  	wrmsr
 
  	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
- 	; CR0 ÄÁÆ®·Ñ ·¹Áö½ºÅÍ¸¦ ¼³Á¤ÇÏ¿© Ä³½Ã ±â´É°ú ÆäÀÌÂ¡ ±â´ÉÀ» È°¼ºÈ­
+ 	; CR0 ì»¨íŠ¸ë¡¤ ë ˆì§€ìŠ¤í„°ë¥¼ ì„¤ì •í•˜ì—¬ ìºì‹œ ê¸°ëŠ¥ê³¼ íŽ˜ì´ì§• ê¸°ëŠ¥ì„ í™œì„±í™”
  	;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
  	mov eax, cr0
- 	;or eax, 0xE0000000
- 	;xor eax, 0x60000000
- 	and eax, 0x1fffffff ; 29, 30, 31ºñÆ®¸¦ ¸ðµÎ 0À¸·Î ¼³Á¤ÇÔ
- 	or eax, 0x80000000; 31ºñÆ®¸¦ 1·Î ¼³Á¤ÇÔ
+ 	or eax, 0xE0000000
+ 	xor eax, 0x60000000
+ 	;and eax, 0x1fffffff ; 29, 30, 31ë¹„íŠ¸ë¥¼ ëª¨ë‘ 0ìœ¼ë¡œ ì„¤ì •í•¨
+ 	;or eax, 0x80000000; 31ë¹„íŠ¸ë¥¼ 1ë¡œ ì„¤ì •í•¨
  	mov cr0, eax
 
  	jmp 0x08:0x200000

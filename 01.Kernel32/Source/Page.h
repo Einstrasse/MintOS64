@@ -32,7 +32,7 @@ typedef struct kPageTableEntryStruct {
 	// 11bit Base Address
 	DWORD dwAttributeAndLowerBaseAddress;
 	// 8bit Upper Base Address, 12bit Reserved, 11bit Avail, 1bit EXB
-	DWORD dwUpperBaseAddressAnxEXB;
+	DWORD dwUpperBaseAddressAndEXB;
 } PML4TENTRY, PDPTENTRY, PDENTRY, PTENTRY; //PML4 Table Entry, Page Directory Pointer Table Entry, Page Directory Entry, Page Table Entry
 #pragma pack( pop )
 
