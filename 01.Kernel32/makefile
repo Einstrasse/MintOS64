@@ -62,7 +62,7 @@ ASSEMBLYOBJECTFILES = $(notdir $(patsubst %.asm,%.o,$(ASSEMBLYSOURCEFILES)))
 InternalDependency:
 	$(GCC32) -MM $(CSOURCEFILES) > Dependency.dep
 	
-Kernel32.elf: $(CENTRYPOINTOBJECTFILE) $(COBJECTFILES) $(ASSEMBLYOJECTFILES)
+Kernel32.elf: $(CENTRYPOINTOBJECTFILE) $(COBJECTFILES) $(ASSEMBLYOBJECTFILES)
 	$(LD32) -o $@ $^
 	
 ifeq (Dependency.dep, $(wildcard Dependency.dep))

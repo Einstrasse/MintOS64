@@ -44,7 +44,7 @@ jmp .A20GATESUCCESS
 	; 보호모드에서 세그먼트 디스크립터를 GDTR에서 오프셋 0x08에 있는놈을 가르키게 하기 위해서 dword 0x08: 가 들어감
 	; 리얼모드에서 코드 세그먼트 레지스터에 0x1000이 들어있었으므로 Base address가 0x10000이었다. 따라서 이 값을 더해줘야
 	; 리얼모드->보호모드 로 변경되더라도 같은 주소를 가르키게 된다.
-	jmp dword 0x08: (PROTECTEDMODE - $$ + 0x10000)
+	jmp dword 0x18: (PROTECTEDMODE - $$ + 0x10000)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ; Enter to protected mode
@@ -52,7 +52,7 @@ jmp .A20GATESUCCESS
 
 [BITS 32]
 PROTECTEDMODE:
-	mov ax, 0x10
+	mov ax, 0x20	; 보호 모드 커널용 데이터 세그먼트 디스크립터를 AX 레지스터에 저장
 	mov ds, ax
 	mov es, ax
 	mov fs, ax
@@ -68,7 +68,7 @@ PROTECTEDMODE:
 	call PRINTMESSAGE
 	add esp, 12
 
-	jmp dword 0x08: 0x10200 ; Jump to C kernel
+	jmp dword 0x18: 0x10200 ; Jump to C kernel
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ; function code area
@@ -120,20 +120,42 @@ PRINTMESSAGE:
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ; data area
 ;;;;;;;;;;;;;;;;;;;;;;;;
+; 아래 데이터들을 8바이트에 맞추어 정렬하기 위함
 align 8, db 0
 
+;GDTR의 끝을 8바이트에 맞추어 정렬하기 위해 추가
 dw 0x0000
+;GDTR 자료구조 정의
 GDTR:
 	dw GDTEND - GDT - 1
 	dd ( GDT - $$ + 0x10000 )
 
+;GDT 테이블 정의
 GDT:
+	; 널(NULL) 디스크립터, 반드시 0으로 초기화해야 함
 	NULLDescriptor:
 		dw 0x0000
 		dw 0x0000
 		db 0x00
 		db 0x00
 		db 0x00
+		db 0x00
+
+	; IA-32e 모드 커널용 코드 세그먼트 디스크립터
+	IA_32eCODEDESCRIPTOR:
+		dw 0xFFFF
+		dw 0x0000
+		db 0x00
+		db 0x9A
+		db 0xAF
+		db 0x00
+
+	IA_32eDATADESCRIPTOR:
+		dw 0xFFFF
+		dw 0x0000
+		db 0x00
+		db 0x92
+		db 0xAF
 		db 0x00
 
 	CODEDESCRIPTOR:
