@@ -1,0 +1,8 @@
+*.o
+*.dep
+*.bin
+Disk.img
+01.Kernel32/Temp
+02.Kernel64/Temp
+ref
+source_code.zip
